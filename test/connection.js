@@ -30,4 +30,21 @@ describe('connection', function() {
         });
     });
 
+    describe('callProcedure', function() {
+        it('should call stored procedure with correct sp name and parameters', function(done) {
+            var expectedSpName = 'get_user_emplyment_details';
+            var expectedParams = [{
+                name: 'username',
+                type: 'NVarChar',
+                value: 'wsmith'
+            }];
+            var connection = getConnection();
+            fakeTedious.on('procedure', function(request) {
+                expect(request.getCommandText()).to.be.equal(expectedSpName);
+                expect(JSON.stringify(request.getParameters())).to.be.equal(JSON.stringify(expectedParams));
+            });
+            connection.callProcedure(expectedSpName, expectedParams).then(done);
+        });
+    });
+
 });

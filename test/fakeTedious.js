@@ -1,7 +1,34 @@
 var EventEmitter = require('events').EventEmitter;
 var eventEmitter = new EventEmitter();
 
+var Connection = function Connection() {
+    this.on = function(eventName, callback) {
+        if (eventName != 'connect') {
+            throw Error('Can only respond to the \'connect\' event.');
+        }
+
+        callback();
+    };
+
+    this.close = function() {};
+
+    this.execSql = function(request) {
+        this.emit('sql', request);
+        request._executeCallback();
+    };
+
+    this.callProcedure = function(request) {
+        this.emit('procedure', request);
+        request._executeCallback();
+    };
+};
+
+Connection.prototype.emit = function() {
+    eventEmitter.emit.apply(eventEmitter, arguments);
+};
+
 var Request = function Request(commandText, callback) {
+    
     var parameters = [];
 
     this.addParameter = function(name, type, value) {
@@ -21,27 +48,6 @@ var Request = function Request(commandText, callback) {
     };
 
     this._executeCallback = callback;
-};
-
-var Connection = function Connection() {
-    this.on = function(eventName, callback) {
-        if (eventName != 'connect') {
-            throw Error('Can only respond to the \'connect\' event.');
-        }
-
-        callback();
-    };
-
-    this.close = function() {};
-
-    this.execSql = function(request) {
-        this.emit('sql', request);
-        request._executeCallback();
-    };
-};
-
-Connection.prototype.emit = function() {
-    eventEmitter.emit.apply(eventEmitter, arguments);
 };
 
 module.exports = {
