@@ -6,7 +6,7 @@ describe('repository', function() {
         fakes = fakes || {};
         return proxyquire('../lib/repository', {
             './query': fakes.query || function() {}
-        })();
+        });
     };
 
     var testModel = {
