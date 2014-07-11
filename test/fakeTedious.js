@@ -28,7 +28,7 @@ Connection.prototype.emit = function() {
 };
 
 var Request = function Request(commandText, callback) {
-    
+
     var parameters = [];
 
     this.addParameter = function(name, type, value) {

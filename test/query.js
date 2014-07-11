@@ -1,4 +1,4 @@
-var proxyquire = require('proxyquire').noCallThru();;
+var proxyquire = require('proxyquire').noCallThru();
 
 describe('query', function() {
 
@@ -29,6 +29,22 @@ describe('query', function() {
             expect(query.select().operation).to.be.equal('select');
             done();
         });
+
+        it('should set select_columns to * if nothing is specified', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            query.select();
+            expect(query.select_columns).to.be.equal('*');
+            done();
+        });
+
+        it('should set select_columns to expected select string', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            query.select(['id', 'name', 'age']);
+            expect(query.select_columns).to.be.equal('id, name, age');
+            done();
+        });
     });
 
     describe('query.from', function() {
@@ -44,6 +60,23 @@ describe('query', function() {
             var Query = getQuery();
             var query = new Query();
             expect(query.from(expectedTable).from).to.be.equal(expectedTable);
+            done();
+        });
+    });
+
+    describe('query.where', function() {
+        it('should return same query object', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            expect(query.where()).to.be.equal(query);
+            done();
+        });
+
+        it('should set the query from to given table', function(done) {
+            var expectedExpression = 'what_ever_expression';
+            var Query = getQuery();
+            var query = new Query();
+            expect(query.where(expectedExpression).where).to.be.equal(expectedExpression);
             done();
         });
     });
@@ -82,7 +115,7 @@ describe('query', function() {
 
     describe('query._getQuery', function() {
 
-        it('should return select * from table', function(done) {
+        it('should be able to generate \"select * from table\"', function(done) {
             var expectedTable = 'whatevertable';
             var fakeConnection = {
                 executeSql: function(query) {
@@ -97,6 +130,24 @@ describe('query', function() {
             });
             var query = new Query();
             query.select().from(expectedTable).execute().then(done);
+
+        });
+
+        it('should be able to generate \"select * from table where filed = @filed\"', function(done) {
+            var expectedTable = 'table';
+            var fakeConnection = {
+                executeSql: function(query) {
+                    expect(query).to.be.equal('select * from table where filed = @filed');
+                    var deferred = Q.defer();
+                    deferred.resolve();
+                    return deferred.promise;
+                }
+            };
+            var Query = getQuery({
+                connection: fakeConnection
+            });
+            var query = new Query();
+            query.select().from(expectedTable).where().execute().then(done);
 
         });
     });
