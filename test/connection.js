@@ -26,7 +26,9 @@ describe('connection', function() {
                 expect(request.getCommandText()).to.be.equal(expectedSql);
                 expect(JSON.stringify(request.getParameters())).to.be.equal(JSON.stringify(expectedParams));
             });
-            connection.executeSql(expectedSql, expectedParams).then(done);
+            connection.executeSql(expectedSql, expectedParams).then(function() {
+                done();
+            });
         });
     });
 

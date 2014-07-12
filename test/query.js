@@ -26,7 +26,7 @@ describe('query', function() {
         it('should set the query operation as select', function(done) {
             var Query = getQuery();
             var query = new Query();
-            expect(query.select().operation).to.be.equal('select');
+            expect(query.select().data.operation).to.be.equal('select');
             done();
         });
 
@@ -34,7 +34,7 @@ describe('query', function() {
             var Query = getQuery();
             var query = new Query();
             query.select();
-            expect(query.select_columns).to.be.equal('*');
+            expect(query.data.select_columns).to.be.equal('*');
             done();
         });
 
@@ -42,7 +42,7 @@ describe('query', function() {
             var Query = getQuery();
             var query = new Query();
             query.select(['id', 'name', 'age']);
-            expect(query.select_columns).to.be.equal('id, name, age');
+            expect(query.data.select_columns).to.be.equal('id, name, age');
             done();
         });
     });
@@ -59,7 +59,7 @@ describe('query', function() {
             var expectedTable = 'whatevertable';
             var Query = getQuery();
             var query = new Query();
-            expect(query.from(expectedTable).from).to.be.equal(expectedTable);
+            expect(query.from(expectedTable).data.from).to.be.equal(expectedTable);
             done();
         });
     });
@@ -76,7 +76,32 @@ describe('query', function() {
             var expectedExpression = 'what_ever_expression';
             var Query = getQuery();
             var query = new Query();
-            expect(query.where(expectedExpression).where).to.be.equal(expectedExpression);
+            expect(query.where(expectedExpression).data.where).to.be.equal(expectedExpression);
+            done();
+        });
+    });
+
+    describe('query.limit', function() {
+        it('should return same query object', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            expect(query.limit(1)).to.be.equal(query);
+            done();
+        });
+
+        it('should throw an error if argument is not a number', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            expect(query.limit.bind('notanumber')).to.throw('Invalid argument');
+            expect(query.limit.bind('12')).to.throw('Invalid argument');
+            expect(query.limit.bind()).to.throw('Invalid argument');
+            done();
+        });
+
+        it('should set query.limit ', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+            expect(query.limit(1).data.limit).to.be.equal(1);
             done();
         });
     });
@@ -119,7 +144,7 @@ describe('query', function() {
             var expectedTable = 'whatevertable';
             var fakeConnection = {
                 executeSql: function(query) {
-                    expect(query).to.be.equal('select * from '+ expectedTable);
+                    expect(query).to.be.equal('select * from ' + expectedTable);
                     var deferred = Q.defer();
                     deferred.resolve();
                     return deferred.promise;
@@ -133,24 +158,70 @@ describe('query', function() {
 
         });
 
-        // it('should be able to generate \"select * from table where filed = @filed\"', function(done) {
-        //     var expectedTable = 'table';
-        //     var fakeConnection = {
-        //         executeSql: function(query) {
-        //             expect(query).to.be.equal('select * from table where filed = @filed');
-        //             var deferred = Q.defer();
-        //             deferred.resolve();
-        //             return deferred.promise;
-        //         }
-        //     };
-        //     var Query = getQuery({
-        //         connection: fakeConnection
-        //     });
-        //     var query = new Query();
-        //     query.select().from(expectedTable).where().execute().then(done);
+        it('should be able to generate \"select * from table where filed = @filed\"', function(done) {
+            var expectedTable = 'table';
+            var whereExpression = {
+                restrictions: [{
+                    field: 'field',
+                    value: 'fieldValue',
+                    condition: '='
+                }]
+            };
 
-        // });
+            var model = {
+                'filed': 'NVarChar'
+            };
+
+            var fakeConnection = {
+                executeSql: function(query) {
+                    expect(query).to.be.equal('select * from table where field = @field');
+                    var deferred = Q.defer();
+                    deferred.resolve();
+                    return deferred.promise;
+                }
+            };
+            var Query = getQuery({
+                connection: fakeConnection
+            });
+            var query = new Query(model);
+            query.select().from(expectedTable).where(whereExpression).execute().then(done);
+
+        });
     });
+
+    describe('query._getParameters', function() {
+        it('should be able to extract parameters from where expression', function(done) {
+            var expectedTable = 'table';
+            var whereExpression = {
+                restrictions: [{
+                    field: 'field',
+                    value: 'fieldValue',
+                    condition: '='
+                }]
+            };
+
+            var model = {
+                'field': 'NVarChar'
+            };
+
+            var fakeConnection = {
+                executeSql: function(query, parameters) {
+                    expect(parameters.length).to.be.equal(1);
+                    expect(parameters[0].name).to.be.equal('field');
+                    expect(parameters[0].value).to.be.equal('fieldValue');
+                    expect(parameters[0].type).to.be.equal('NVarChar');
+                    var deferred = Q.defer();
+                    deferred.resolve();
+                    return deferred.promise;
+                }
+            };
+            var Query = getQuery({
+                connection: fakeConnection
+            });
+            var query = new Query(model);
+            query.select().from(expectedTable).where(whereExpression).execute().then(done);
+        })
+    })
 });
 
 function isPromise(object) {
