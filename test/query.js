@@ -133,23 +133,23 @@ describe('query', function() {
 
         });
 
-        it('should be able to generate \"select * from table where filed = @filed\"', function(done) {
-            var expectedTable = 'table';
-            var fakeConnection = {
-                executeSql: function(query) {
-                    expect(query).to.be.equal('select * from table where filed = @filed');
-                    var deferred = Q.defer();
-                    deferred.resolve();
-                    return deferred.promise;
-                }
-            };
-            var Query = getQuery({
-                connection: fakeConnection
-            });
-            var query = new Query();
-            query.select().from(expectedTable).where().execute().then(done);
+        // it('should be able to generate \"select * from table where filed = @filed\"', function(done) {
+        //     var expectedTable = 'table';
+        //     var fakeConnection = {
+        //         executeSql: function(query) {
+        //             expect(query).to.be.equal('select * from table where filed = @filed');
+        //             var deferred = Q.defer();
+        //             deferred.resolve();
+        //             return deferred.promise;
+        //         }
+        //     };
+        //     var Query = getQuery({
+        //         connection: fakeConnection
+        //     });
+        //     var query = new Query();
+        //     query.select().from(expectedTable).where().execute().then(done);
 
-        });
+        // });
     });
 });
 

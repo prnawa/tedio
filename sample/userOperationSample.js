@@ -33,4 +33,4 @@ var onFaliure = function(error) {
 
 userRepository.all().then(onSucess, onFaliure);
 
-//userRepository.findOneBy(exp().Eq('Email', 'a@aa.com').And().Gt('age', 5)).then(onSucess, onFaliure);
+//userRepository.findOneBy(expr().Eq('Email', 'a@aa.com').And().Gt('age', 5)).then(onSucess, onFaliure);
