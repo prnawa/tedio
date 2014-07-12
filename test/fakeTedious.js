@@ -1,7 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var eventEmitter = new EventEmitter();
 
-var resultSet;
+var resultSet = [];
 
 var Connection = function Connection() {
     this.on = function(eventName, callback) {
@@ -16,6 +16,7 @@ var Connection = function Connection() {
 
     this.execSql = function(request) {
         this.emit('sql', request);
+
         request._executeCallback(null, resultSet.length, resultSet);
     };
 
