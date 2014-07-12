@@ -4,8 +4,8 @@ module.exports = function(grunt) {
         watch: {
             scripts: {
                 files: [
-                    'lib/*.js',
-                    'test/*.js'
+                    'lib/**/*.js',
+                    'test/**/*.js'
                 ],
                 tasks: ['mochaTest'],
                 options: {
