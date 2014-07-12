@@ -56,5 +56,6 @@ module.exports = {
     TYPES: {},
     on: function() {
         eventEmitter.on.apply(eventEmitter, arguments);
-    }
+    },
+    '@runtimeGlobal': true
 };
