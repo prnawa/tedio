@@ -1,6 +1,6 @@
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('tedio : Integration Tests', function() {
+describe('tedio : integration tests', function() {
 
     var fakeTedious;
     var tedio;
@@ -69,6 +69,29 @@ describe('tedio : Integration Tests', function() {
     });
 
     it('should be able to retrive specific data record', function(done) {
+        var repository = getRepository(getModel());
+        var fakeData = getFakeData();
+        fakeTedious.setResults(_.first(fakeData, 1));
+
+        fakeTedious.on('sql', function(req) {
+            expect(req.getCommandText()).to.be.equal('select ID, Email from table where Email = @Email');
+            expect(req.getParameters().length).to.be.equal(1);
+            expect(req.getParameters()[0].name).to.be.equal('Email');
+            expect(req.getParameters()[0].value).to.be.equal(_.first(fakeData).Email.value);
+            expect(req.getParameters()[0].type).to.be.equal('NVarChar');
+        });
+        var onSucess = function(result) {
+            expect(result.username).to.be.equal(_.first(fakeData).Email.value)
+            done();
+        };
+
+        var expr = tedio.expression;
+        var criteria = tedio.criteria.create().add(expr.Eq('Email', _.first(fakeData).Email.value));
+
+        repository.findOneBy(criteria).then(onSucess, done);
+    });
+
+    it('should be able to call named query(stored procedure', function(done) {
         var repository = getRepository(getModel());
         var fakeData = getFakeData();
         fakeTedious.setResults(_.first(fakeData, 1));

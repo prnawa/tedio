@@ -1,6 +1,6 @@
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('query', function() {
+describe('query : unit tests', function() {
 
     var getQuery = function(fakes) {
         fakes = fakes || {};

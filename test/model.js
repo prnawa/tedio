@@ -1,6 +1,6 @@
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('model', function() {
+describe('model : unit tests', function() {
 
     var getModel = function(options) {
         return proxyquire('../lib/model', {})(options);
@@ -35,7 +35,7 @@ describe('model', function() {
         var expectedId = 'INTEGER';
         var expectedRow = {};
         var model = getModel({
-            map : function(row){
+            map: function(row) {
                 expect(row).to.be.equal(expectedRow);
                 done();
             }

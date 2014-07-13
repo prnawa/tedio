@@ -1,7 +1,7 @@
 var proxyquire = require('proxyquire').noCallThru();
 var fakeTedious = require('./fakeTedious');
 
-describe('connection', function() {
+describe('connection : unit tests', function() {
 
     var getConnection = function(options) {
         return proxyquire('../lib/connection', {

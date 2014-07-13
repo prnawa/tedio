@@ -1,6 +1,6 @@
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('criteria', function() {
+describe('criteria : unit tests', function() {
 
     var getCriteria = function() {
         return proxyquire('../lib/criteria', {});

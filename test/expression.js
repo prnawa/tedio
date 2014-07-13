@@ -1,6 +1,6 @@
 var proxyquire = require('proxyquire').noCallThru();
 
-describe('expression', function() {
+describe('expression : unit tests', function() {
 
     var getExpression = function() {
         return proxyquire('../lib/expression', {});
