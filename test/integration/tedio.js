@@ -92,25 +92,27 @@ describe('tedio : integration tests', function() {
     });
 
     it('should be able to call named query(stored procedure', function(done) {
-        var repository = getRepository(getModel());
+        var repository = getRepository();
         var fakeData = getFakeData();
-        fakeTedious.setResults(_.first(fakeData, 1));
+        var namedOperation = 'get_user_details';
+        var params = [{
+            name: 'username',
+            value: 'simon',
+            type: 'TEXT'
+        }];
+        fakeTedious.setResults(fakeData);
 
         fakeTedious.on('sql', function(req) {
-            expect(req.getCommandText()).to.be.equal('select ID, Email from table where Email = @Email');
+            expect(req.getCommandText()).to.be.equal(namedOperation);
             expect(req.getParameters().length).to.be.equal(1);
-            expect(req.getParameters()[0].name).to.be.equal('Email');
-            expect(req.getParameters()[0].value).to.be.equal(_.first(fakeData).Email.value);
-            expect(req.getParameters()[0].type).to.be.equal('NVarChar');
+            expect(req.getParameters()[0].name).to.be.equal(params.name);
+            expect(req.getParameters()[0].value).to.be.equal(params.value);
+            expect(req.getParameters()[0].type).to.be.equal(params.type);
         });
         var onSucess = function(result) {
-            expect(result.username).to.be.equal(_.first(fakeData).Email.value)
             done();
         };
 
-        var expr = tedio.expression;
-        var criteria = tedio.criteria.create().add(expr.Eq('Email', _.first(fakeData).Email.value));
-
-        repository.findOneBy(criteria).then(onSucess, done);
+        repository.namedOperation(namedOperation, params).then(onSucess, done);
     });
 });
