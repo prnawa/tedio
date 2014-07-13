@@ -16,13 +16,12 @@ var Connection = function Connection() {
 
     this.execSql = function(request) {
         this.emit('sql', request);
-
         request._executeCallback(null, resultSet.length, resultSet);
     };
 
     this.callProcedure = function(request) {
         this.emit('procedure', request);
-        request._executeCallback();
+        request._executeCallback(null, resultSet.length, resultSet);
     };
 };
 
@@ -53,10 +52,19 @@ var Request = function Request(commandText, callback) {
     this._executeCallback = callback;
 };
 
+var TYPES = {
+    Int: {
+        name: 'Int'
+    },
+    NVarChar: {
+        name: 'NVarChar'
+    }
+};
+
 module.exports = {
     Connection: Connection,
     Request: Request,
-    TYPES: {},
+    TYPES: TYPES,
     on: function() {
         eventEmitter.on.apply(eventEmitter, arguments);
     },

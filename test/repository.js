@@ -1,5 +1,3 @@
-var proxyquire = require('proxyquire').noCallThru();
-
 describe('repository : unit tests', function() {
 
     var getRepository = function(fakes) {

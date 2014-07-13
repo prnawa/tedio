@@ -1,4 +1,4 @@
-var proxyquire = require('proxyquire').noCallThru();
+var proxyquire = require('proxyquire').noCallThru().noPreserveCache();
 
 describe('tedio : integration tests', function() {
 
@@ -95,24 +95,21 @@ describe('tedio : integration tests', function() {
         var repository = getRepository();
         var fakeData = getFakeData();
         var namedOperation = 'get_user_details';
-        var params = [{
-            name: 'username',
-            value: 'simon',
-            type: 'TEXT'
-        }];
         fakeTedious.setResults(fakeData);
-
-        fakeTedious.on('sql', function(req) {
+        var params = tedio.parameters().setNVarChar('username', 'simon');
+        fakeTedious.on('procedure', function(req) {
             expect(req.getCommandText()).to.be.equal(namedOperation);
-            expect(req.getParameters().length).to.be.equal(1);
-            expect(req.getParameters()[0].name).to.be.equal(params.name);
-            expect(req.getParameters()[0].value).to.be.equal(params.value);
-            expect(req.getParameters()[0].type).to.be.equal(params.type);
+            var actualParams = req.getParameters();
+            expect(actualParams.length).to.be.equal(1);
+            expect(actualParams[0].name).to.be.equal(params.params[0].name);
+            expect(actualParams[0].value).to.be.equal(params.params[0].value);
+            expect(actualParams[0].type).to.be.equal(params.params[0].type);
         });
         var onSucess = function(result) {
+            expect(JSON.stringify(result)).to.be.equal(JSON.stringify(fakeData));
             done();
         };
 
-        repository.namedOperation(namedOperation, params).then(onSucess, done);
+        repository.namedOperation(namedOperation, params.params).then(onSucess, done);
     });
 });

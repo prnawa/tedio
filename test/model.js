@@ -1,5 +1,3 @@
-var proxyquire = require('proxyquire').noCallThru();
-
 describe('model : unit tests', function() {
 
     var getModel = function(options) {

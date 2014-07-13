@@ -1,4 +1,3 @@
-var proxyquire = require('proxyquire').noCallThru();
 var fakeTedious = require('./fakeTedious');
 
 describe('connection : unit tests', function() {
@@ -45,7 +44,9 @@ describe('connection : unit tests', function() {
                 expect(request.getCommandText()).to.be.equal(expectedSpName);
                 expect(JSON.stringify(request.getParameters())).to.be.equal(JSON.stringify(expectedParams));
             });
-            connection.callProcedure(expectedSpName, expectedParams).then(done);
+            connection.callProcedure(expectedSpName, expectedParams).then(function() {
+                done();
+            });
         });
     });
 
