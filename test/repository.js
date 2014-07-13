@@ -21,18 +21,47 @@ describe('repository', function() {
         }
     };
 
-    it('should set the entity table on initialization', function(done) {
+    it('should set the model initialization', function(done) {
         var Repository = getRepository();
         var repository = new Repository(testModel);
-        repository.table.should.equal(testModel.table);
+        repository.model.should.equal(testModel);
         done();
     });
 
-    it('should set the columns to select', function(done) {
-        var Repository = getRepository();
-        var repository = new Repository(testModel);
-        expect(repository.columns.length).to.be.equal(_.keys(testModel.columns).length);
-        done();
+    describe('_getSelect', function() {
+        it('should returns a comma seperated list for selection', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            expect(repository._getSelect().length).to.be.equal(_.keys(testModel.columns).length);
+            done();
+        });
+    });
+
+    describe('_getFrom', function() {
+        it('should returns expected from value', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            expect(repository._getFrom()).to.be.equal(testModel.table);
+            done();
+        });
+    });
+
+    describe('_getFrom', function() {
+        it('should returns expected from value', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            expect(repository._getFrom()).to.be.equal(testModel.table);
+            done();
+        });
+    });
+
+    describe('_getMapper', function() {
+        it('should returns expected mapper function', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            expect(repository._getMapper()).to.be.equal(testModel.map);
+            done();
+        });
     });
 
     describe('all', function() {
@@ -111,4 +140,45 @@ describe('repository', function() {
             }, done);
         });
     });
+
+    describe('namedOperation', function() {
+        //var params = params().setInt().setText().setBoolean();
+        //repos.namedOperation('getUserdetails', params).then()
+        it('should throw an error for invalid arguments', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository();
+
+            expect(repository.namedOperation.bind()).to.throw('Invalid arguments');
+            done()
+        });
+
+        it('should returns expected results', function(done) {
+            var namedOperation = 'getUserdetails';
+            var expectedResult = 'some results';
+            var params = [{
+                name: 'username',
+                value: 'simon',
+                type: 'TEXT'
+            }];
+
+            var Repository = getRepository({
+                query: function() {
+                    var that = this;
+
+                    this.executeNamedQuery = function(namedQuery, parameters) {
+                        var deferred = Q.defer();
+                        deferred.resolve(expectedResult);
+                        return deferred.promise;
+                    };
+                }
+            });
+
+            var repository = new Repository();
+
+            repository.namedOperation(namedOperation, params).then(function(result) {
+                expect(JSON.stringify(result), JSON.stringify(expectedResult[0]));
+                done();
+            }, done);
+        })
+    })
 });

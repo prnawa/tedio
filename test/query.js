@@ -138,6 +138,40 @@ describe('query', function() {
         });
     });
 
+    describe('query.executeNamedQuery', function() {
+        it('should return a promise', function(done) {
+            var Query = getQuery();
+            var query = new Query();
+
+            expect(isPromise(query.executeNamedQuery())).to.be.ok;
+            done();
+        });
+
+        it('should return result on success', function(done) {
+            var expectedResult = 'whateverresult';
+            var expectedNamedQuery = 'whateverspname';
+            var expectedSpParams = 'whateverparams';
+            var fakeConnection = {
+                executeSql: function(query, parms) {
+                    expect(query).to.be.equal(expectedNamedQuery);
+                    expect(parms).to.be.equal(expectedSpParams);
+                    var deferred = Q.defer();
+                    deferred.resolve(expectedResult);
+                    return deferred.promise;
+                }
+            };
+            var Query = getQuery({
+                connection: fakeConnection
+            });
+            var query = new Query();
+            query.executeNamedQuery(expectedNamedQuery, expectedSpParams).then(function(result) {
+                expect(result).to.be.equal(expectedResult);
+                done();
+            });
+
+        });
+    });
+
     describe('query._getQuery', function() {
 
         it('should be able to generate \"select * from table\"', function(done) {
