@@ -55,11 +55,43 @@ describe('repository', function() {
         });
     });
 
-    describe('_getMapper', function() {
-        it('should returns expected mapper function', function(done) {
+    describe('_toList', function() {
+        it('should returns colection of objects', function(done) {
             var Repository = getRepository();
             var repository = new Repository(testModel);
-            expect(repository._getMapper()).to.be.equal(testModel.map);
+            var expectedResult = [1, 2];
+            var toList = repository._toList();
+            expect(toList(expectedResult).length).to.be.equal(expectedResult.length);
+            done();
+        });
+    });
+
+    describe('_single', function() {
+        it.skip('should throw error if result contain more that one rows', function(done) {
+            // this test has an interecting behaviour need more pro knowledge.
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            var expectedResult = [1, 2];
+            var single = repository._single();
+            //expect(single.bind(expectedResult)).to.throw('Should not contain more than one result');
+            done();
+        });
+
+        it('should returns a single object for non empty result', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            var expectedResult = [1];
+            var single = repository._single();
+            expect(single(expectedResult)).to.equal(1);
+            done();
+        });
+
+        it('should returns a null for empty result', function(done) {
+            var Repository = getRepository();
+            var repository = new Repository(testModel);
+            var expectedResult = [];
+            var single = repository._single();
+            expect(single(expectedResult)).to.equal(null);
             done();
         });
     });
