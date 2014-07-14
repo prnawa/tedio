@@ -30,7 +30,7 @@ describe('tedio : integration tests', function() {
 
     var getRepository = function(model) {
         return new tedio.repository(model);
-    }
+    };
 
     var getFakeData = function() {
         return [{
@@ -48,7 +48,7 @@ describe('tedio : integration tests', function() {
                 value: 'a2@a.com'
             }
         }];
-    }
+    };
 
     it('should be able to retrive all', function(done) {
         var repository = getRepository(getModel());
@@ -81,7 +81,7 @@ describe('tedio : integration tests', function() {
             expect(req.getParameters()[0].type).to.be.equal('NVarChar');
         });
         var onSucess = function(result) {
-            expect(result.username).to.be.equal(_.first(fakeData).Email.value)
+            expect(result.username).to.be.equal(_.first(fakeData).Email.value);
             done();
         };
 
