@@ -17,13 +17,17 @@ describe('connection : unit tests', function() {
                 value: 'wsmith'
             }, {
                 name: 'age',
-                type: 'SmallInt',
+                type: 'Int',
                 value: 12
             }];
             var connection = getConnection();
             fakeTedious.on('sql', function(request) {
                 expect(request.getCommandText()).to.be.equal(expectedSql);
-                expect(JSON.stringify(request.getParameters())).to.be.equal(JSON.stringify(expectedParams));
+                _.map(request.getParameters(), function(param, index){
+                    expect(param.name).to.be.equal(expectedParams[index].name);
+                    expect(param.value).to.be.equal(expectedParams[index].value);
+                    expect(param.type.name).to.be.equal(expectedParams[index].type);
+                });
             });
             connection.executeSql(expectedSql, expectedParams).then(function() {
                 done();
@@ -42,7 +46,11 @@ describe('connection : unit tests', function() {
             var connection = getConnection();
             fakeTedious.on('procedure', function(request) {
                 expect(request.getCommandText()).to.be.equal(expectedSpName);
-                expect(JSON.stringify(request.getParameters())).to.be.equal(JSON.stringify(expectedParams));
+                _.map(request.getParameters(), function(param, index){
+                    expect(param.name).to.be.equal(expectedParams[index].name);
+                    expect(param.value).to.be.equal(expectedParams[index].value);
+                    expect(param.type.name).to.be.equal(expectedParams[index].type);
+                });
             });
             connection.callProcedure(expectedSpName, expectedParams).then(function() {
                 done();

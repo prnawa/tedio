@@ -75,10 +75,11 @@ describe('tedio : integration tests', function() {
 
         fakeTedious.on('sql', function(req) {
             expect(req.getCommandText()).to.be.equal('select ID, Email from table where Email = @Email');
+            var actualParams = req.getParameters();
             expect(req.getParameters().length).to.be.equal(1);
-            expect(req.getParameters()[0].name).to.be.equal('Email');
-            expect(req.getParameters()[0].value).to.be.equal(_.first(fakeData).Email.value);
-            expect(req.getParameters()[0].type).to.be.equal('NVarChar');
+            expect(actualParams[0].name).to.be.equal('Email');
+            expect(actualParams[0].value).to.be.equal(_.first(fakeData).Email.value);
+            expect(actualParams[0].type.name).to.be.equal('NVarChar');
         });
         var onSucess = function(result) {
             expect(result.username).to.be.equal(_.first(fakeData).Email.value);
@@ -99,11 +100,11 @@ describe('tedio : integration tests', function() {
         var params = tedio.parameters().setNVarChar('username', 'simon');
         fakeTedious.on('procedure', function(req) {
             expect(req.getCommandText()).to.be.equal(namedOperation);
-            var actualParams = req.getParameters();
-            expect(actualParams.length).to.be.equal(1);
-            expect(actualParams[0].name).to.be.equal(params.params[0].name);
-            expect(actualParams[0].value).to.be.equal(params.params[0].value);
-            expect(actualParams[0].type).to.be.equal(params.params[0].type);
+            _.map(req.getParameters(), function(acparam, index){
+                expect(acparam.name).to.be.equal(params.params[index].name);
+                expect(acparam.value).to.be.equal(params.params[index].value);
+                expect(acparam.type.name).to.be.equal(params.params[index].type);
+            });
         });
         var onSucess = function(result) {
             expect(JSON.stringify(result)).to.be.equal(JSON.stringify(fakeData));
